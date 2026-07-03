@@ -1,0 +1,23 @@
+Criar projeto Spring Boot 3 + Java 21.
+
+Implementar:
+- Multi Datasource
+- PostgreSQL Fundação
+- PostgreSQL Tasy
+- JPA
+- Flyway
+- Swagger
+
+Fluxo:
+Lead -> Prospect -> Proposta -> Beneficiários -> Portabilidade -> Contrato
+
+Estrutura:
+controller
+service
+repository
+entity
+dto
+mapper
+config
+
+Aplicar SOLID e Clean Architecture.

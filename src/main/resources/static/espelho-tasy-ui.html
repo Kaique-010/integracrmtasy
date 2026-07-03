@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integracao Manual Espelho Tasy</title>
+    <style>
+        :root {
+            color-scheme: light;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background: #f5f7fb;
+            color: #1f2937;
+        }
+
+        main {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .card {
+            background: #ffffff;
+            border: 1px solid #d7deea;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+        }
+
+        h1, h2 {
+            margin-top: 0;
+        }
+
+        .grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .grid-2 {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        input[type="text"],
+        select,
+        textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px;
+            border: 1px solid #b8c4d6;
+            border-radius: 8px;
+            font: inherit;
+            background: #fff;
+        }
+
+        textarea {
+            min-height: 420px;
+            resize: vertical;
+            font-family: Consolas, monospace;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+
+        button {
+            border: 0;
+            border-radius: 8px;
+            padding: 12px 18px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .primary {
+            background: #2563eb;
+            color: #fff;
+        }
+
+        .secondary {
+            background: #e5e7eb;
+            color: #111827;
+        }
+
+        pre {
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 16px;
+            border-radius: 8px;
+            overflow: auto;
+            min-height: 180px;
+        }
+
+        .status {
+            margin-bottom: 16px;
+            padding: 12px 14px;
+            border-radius: 8px;
+            background: #e0f2fe;
+            color: #075985;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .muted {
+            color: #4b5563;
+            font-size: 14px;
+        }
+
+        @media (max-width: 900px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<main>
+    <div class="card">
+        <h1>Integracao Manual do Espelho Tasy</h1>
+        
+        <div id="status" class="status">Verificando backend...</div>
+        <div class="grid grid-2">
+            <section>
+                <label for="origem">Origem da carga</label>
+                <input id="origem" type="text" value="ui-manual">
+
+                <label for="tipoCarga" style="margin-top: 16px;">Tipo de carga</label>
+                <select id="tipoCarga">
+                    <option value="todos">Todos os dados</option>
+                    <option value="secao">Carga individual por secao</option>
+                </select>
+
+                <label for="secao" style="margin-top: 16px;">Secao individual</label>
+                <select id="secao" disabled>
+                    <option value="pessoasJuridicas">Pessoas juridicas</option>
+                    <option value="pessoasFisicas">Pessoas fisicas</option>
+                    <option value="leads">Leads</option>
+                    <option value="solicitacoesLead">Solicitacoes lead</option>
+                    <option value="clientes">Clientes</option>
+                    <option value="canais">Canais</option>
+                    <option value="prospects">Prospects</option>
+                    <option value="produtos">Produtos</option>
+                    <option value="produtosProspect">Produtos prospect</option>
+                    <option value="propostasCliente">Propostas cliente</option>
+                    <option value="propostasCanal">Propostas canal</option>
+                    <option value="solicitacoesContrato">Solicitacoes contrato</option>
+                    <option value="contratos">Contratos</option>
+                    <option value="dependentesContrato">Dependentes contrato</option>
+                </select>
+
+                <label for="arquivo" style="margin-top: 16px;">Arquivo JSON</label>
+                <input id="arquivo" type="file" accept=".json,application/json">
+
+                <label for="conteudoJson" style="margin-top: 16px;">Conteudo JSON</label>
+                <textarea id="conteudoJson" spellcheck="false"></textarea>
+
+                <div class="actions">
+                    <button id="preencherExemplo" class="secondary" type="button">Recarregar Exemplo Completo</button>
+                    <button id="limpar" class="secondary" type="button">Limpar</button>
+                    <button id="enviar" class="primary" type="button">Persistir Integracao</button>
+                </div>
+            </section>
+
+            <section>
+                <h2>Resultado</h2>
+                <pre id="resultado">Aguardando envio...</pre>
+
+               
+            </section>
+        </div>
+    </div>
+</main>
+
+<script>
+    const statusEl = document.getElementById("status");
+    const resultadoEl = document.getElementById("resultado");
+    const conteudoJsonEl = document.getElementById("conteudoJson");
+    const origemEl = document.getElementById("origem");
+    const arquivoEl = document.getElementById("arquivo");
+    const tipoCargaEl = document.getElementById("tipoCarga");
+    const secaoEl = document.getElementById("secao");
+
+    const exemplo = {
+        pessoasJuridicas: [
+            {
+                cdCgc: "44556677000188",
+                dsRazaoSocial: "Fundacao Cliente Espelho Saude Ltda",
+                nmFantasia: "Fundacao Cliente Espelho",
+                cdCep: "84010000",
+                dsEndereco: "Rua das Integracoes",
+                dsBairro: "Centro",
+                dsMunicipio: "Ponta Grossa",
+                sgEstado: "PR",
+                dtAtualizacao: "2026-07-03T09:00:00",
+                nmUsuario: "integracao.crm",
+                dsComplemento: "Sala 501",
+                nrTelefone: "4230214000",
+                nrEndereco: "1500",
+                dsEmail: "cliente.espelho@fundacao.local",
+                nmPessoaContato: "Andre Comercial",
+                ieProdFabric: "NAO",
+                ieSituacao: "A"
+            }
+        ],
+        pessoasFisicas: [
+            {
+                cdPessoaFisica: "900001",
+                ieTipoPessoa: 1,
+                nmPessoaFisica: "Andre Comercial",
+                dtAtualizacao: "2026-07-03T09:05:00",
+                nmUsuario: "integracao.crm",
+                dtNascimento: "1985-02-12T00:00:00",
+                ieSexo: "M",
+                nrCpf: "12345678901",
+                nrTelefoneCelular: "42999990001",
+                dsProfissao: "Executivo Comercial",
+                nmSocial: "Andre Comercial",
+                ieDependente: "N"
+            },
+            {
+                cdPessoaFisica: "900002",
+                ieTipoPessoa: 1,
+                nmPessoaFisica: "Maria Beneficiaria",
+                dtAtualizacao: "2026-07-03T09:06:00",
+                nmUsuario: "integracao.crm",
+                dtNascimento: "1992-08-20T00:00:00",
+                ieSexo: "F",
+                nrCpf: "10987654321",
+                nrTelefoneCelular: "42999990002",
+                dsProfissao: "Analista",
+                nmSocial: "Maria Beneficiaria",
+                ieDependente: "N"
+            }
+        ],
+        leads: [
+            {
+                nrSequencia: 7001,
+                dtAtualizacao: "2026-07-03T09:10:00",
+                nmUsuario: "integracao.crm",
+                ieSituacao: "A",
+                dsDescricao: "Lead criado pelo CRM Fundacao"
+            }
+        ],
+        solicitacoesLead: [
+            {
+                nrSequencia: 7001,
+                cdCnpj: "44556677000188",
+                dsRazaoSocial: "Fundacao Cliente Espelho Saude Ltda",
+                dtSolicitacao: "2026-07-03T09:11:00",
+                ieStatusLead: "APR",
+                dtAtualizacao: "2026-07-03T09:11:00",
+                nmUsuario: "integracao.crm",
+                ieNatureza: "J",
+                ieTipo: "NOV",
+                ieFaseVenda: "001",
+                nrSeqCanal: 301,
+                ieStatusNeg: "AND",
+                nrSeqAtiv: 10,
+                ieClassificacao: "A",
+                qtLeito: 120,
+                qtLeitoUti: 20,
+                dsEndereco: "Rua das Integracoes",
+                nrEndereco: "1500",
+                dsComplemento: "Sala 501",
+                dsBairro: "Centro",
+                dsMunicipio: "Ponta Grossa",
+                sgEstado: "PR",
+                cdCep: "84010000",
+                nrTelefone: "4230214000",
+                dsEmail: "cliente.espelho@fundacao.local",
+                nmPessoaContato: "Andre Comercial",
+                nmGestorNegocio: "Equipe CRM Fundacao",
+                dsMotivoCadastro: "Migracao comercial para espelho local",
+                dsCargoContato: "Gerente",
+                dsSetorContato: "Comercial",
+                ieProduto: "PLS",
+                dtAvaliacao: "2026-07-03T09:12:00",
+                cdFormaAquisicao: "CRM",
+                cdPessoaFisica: "900001",
+                nmFantasia: "Fundacao Cliente Espelho",
+                nrSeqPais: 1,
+                nrDdiTelefone: "55"
+            }
+        ],
+        clientes: [
+            {
+                nrSequencia: 7101,
+                cdEmpresa: 1,
+                dtAtualizacao: "2026-07-03T09:20:00",
+                nmUsuario: "integracao.crm",
+                cdCnpj: "44556677000188",
+                ieSituacao: "A",
+                ieNatureza: "J",
+                ieFaseVenda: "002",
+                ieStatusNeg: "AND",
+                ieClassificacao: "A",
+                ieTipo: "NOV",
+                qtLeito: 120,
+                qtLeitoUti: 20,
+                vlFatAnual: 1250000.50,
+                ieRespAtend: "S",
+                ieRecebeVisita: "S",
+                ieReferencia: "N",
+                nrSeqFormaConhec: 2,
+                dtRevisaoPrevista: "2026-07-10T10:00:00",
+                nrSeqAtiv: 10,
+                ieHospEscola: "N",
+                ieRespImplantacao: "S",
+                qtConsultores: 3,
+                qtVidas: 250,
+                ieProduto: "PLS",
+                nrSeqLead: 7001,
+                ieFormaAquisicao: "CRM",
+                cdEstabelecimento: 1,
+                dtCliente: "2026-07-03T09:20:00"
+            }
+        ],
+        canais: [
+            {
+                nrSequencia: 301,
+                cdEmpresa: 1,
+                dtAtualizacao: "2026-07-03T09:09:00",
+                nmUsuario: "integracao.crm",
+                nmGuerra: "Canal Fundacao",
+                cdPessoaFisica: "900001",
+                cdCnpj: "44556677000188",
+                dtInicioAtuacao: "2026-01-01T08:00:00",
+                ieSituacao: "A",
+                nrSeqTipo: 5,
+                dsEmailContato: "canal@fundacao.local"
+            }
+        ],
+        prospects: [
+            {
+                nrSequencia: 7201,
+                cdEstabelecimento: 1,
+                dtAtualizacao: "2026-07-03T09:30:00",
+                nmUsuario: "integracao.crm",
+                cdPessoaFisica: "900001",
+                nrSeqClassif: 11,
+                nrSeqOrigem: 12,
+                nrSeqEstagio: 13,
+                nrSeqAtividade: 10,
+                dtProspect: "2026-07-03T09:30:00",
+                dtLiberacao: "2026-07-03T09:31:00",
+                cdCnpj: "44556677000188",
+                nrSeqProduto: 801,
+                dsCliente: "Fundacao Cliente Espelho Saude Ltda",
+                nrSeqEspecialidade: 1,
+                nrSeqLead: 7001
+            }
+        ],
+        produtos: [
+            {
+                nrSequencia: 801,
+                cdEstabelecimento: 1,
+                dsProduto: "Plano Coletivo Empresarial",
+                dtAtualizacao: "2026-07-03T09:25:00",
+                nmUsuario: "integracao.crm",
+                ieSituacao: "A"
+            }
+        ],
+        produtosProspect: [
+            {
+                nrSequencia: 7301,
+                dtAtualizacao: "2026-07-03T09:32:00",
+                nmUsuario: "integracao.crm",
+                nrSeqProspect: 7201,
+                nrSeqProduto: 801,
+                dsObservacao: "Produto principal do prospect"
+            }
+        ],
+        propostasCliente: [
+            {
+                nrSequencia: 7401,
+                nrSeqCliente: 7101,
+                dtAtualizacao: "2026-07-03T09:40:00",
+                nmUsuario: "integracao.crm",
+                dtProposta: "2026-07-03T09:40:00",
+                dtAprovacao: "2026-07-03T10:00:00",
+                nmUsuarioAprov: "gestor.comercial",
+                dsArquivo: "proposta-7401.pdf",
+                dsObservacao: "Proposta comercial importada do CRM",
+                cdPessoaFisica: "900001",
+                dtLiberacao: "2026-07-03T10:05:00",
+                nmUsuarioLib: "gestor.comercial",
+                dtVencimento: "2026-07-20T23:59:59",
+                ieEscritorioAtual: "N",
+                iePosVendas: "S",
+                dtPrevFechamento: "2026-07-15T18:00:00",
+                ieStatus: "LIBERADA",
+                prFechamento: 85.50,
+                dtIniImplantacao: "2026-07-21T08:00:00"
+            }
+        ],
+        propostasCanal: [
+            {
+                nrSequencia: 7501,
+                nrSeqCanal: 301,
+                dtAtualizacao: "2026-07-03T09:45:00",
+                nmUsuario: "integracao.crm",
+                nrSeqProduto: 801,
+                dtProposta: "2026-07-03T09:45:00",
+                qtProduto: 250,
+                vlTotal: 87500.00,
+                dtAceite: "2026-07-03T10:10:00",
+                dsObservacao: "Aceite comercial registrado",
+                nrSeqCliente: 7101
+            }
+        ],
+        solicitacoesContrato: [
+            {
+                nrSequencia: 7601,
+                cdCnpj: "44556677000188",
+                dsRazaoSocial: "Fundacao Cliente Espelho Saude Ltda",
+                dtSolicitacao: "2026-07-03T10:20:00",
+                ieStatusContrato: "APR",
+                dtAtualizacao: "2026-07-03T10:20:00",
+                nmUsuario: "integracao.crm",
+                ieNatureza: "J",
+                ieTipo: "NOV",
+                ieFaseVenda: "003",
+                nrSeqCanal: 301,
+                qtLicenca: 250,
+                dtRevisaoPrevista: "2026-07-25T10:00:00",
+                vlUnitario: 350.00,
+                ieStatusNeg: "FEC",
+                vlTotal: 87500.00,
+                cdPessoaFisica: "900001",
+                nrSeqAtiv: 10,
+                ieClassificacao: "A",
+                dtInicioVenc: "2026-08-01T00:00:00",
+                qtLeito: 120,
+                qtLeitoUti: 20,
+                vlUnitManut: 25.00,
+                vlManutMensal: 6250.00,
+                dsEndereco: "Rua das Integracoes",
+                dtInicioVencManut: "2026-08-01T00:00:00",
+                nrEndereco: "1500",
+                dsComplemento: "Sala 501",
+                vlUnitDistr: 12.50,
+                dsBairro: "Centro",
+                dsMunicipio: "Ponta Grossa",
+                vlDistribuidor: 3125.00,
+                sgEstado: "PR",
+                cdCep: "84010000",
+                nrTelefone: "4230214000",
+                dsEmail: "cliente.espelho@fundacao.local",
+                nmPessoaContato: "Andre Comercial",
+                nmGestorNegocio: "Equipe CRM Fundacao",
+                dsMotivoCadastro: "Solicitacao espelho integral do contrato",
+                dsCargoContato: "Gerente",
+                dsSetorContato: "Comercial",
+                ieProduto: "PLS",
+                dtAvaliacao: "2026-07-03T10:21:00",
+                nrDdiTelefone: "55",
+                cdFormaAquisicao: "CRM",
+                nmFantasia: "Fundacao Cliente Espelho",
+                nrSeqPais: 1
+            }
+        ],
+        contratos: [
+            {
+                nrSequencia: 7701,
+                cdEstabelecimento: 1,
+                nrSeqTipoContrato: 15,
+                dsObjetoContrato: "Contrato espelho de adesao coletiva empresarial",
+                ieRenovacao: "S",
+                dtAtualizacao: "2026-07-03T10:40:00",
+                nmUsuario: "integracao.crm",
+                ieSituacao: "A",
+                dtInicio: "2026-08-01T00:00:00",
+                dtFim: "2027-07-31T00:00:00",
+                cdCgcContratado: "44556677000188",
+                cdContrato: "CTR-ESP-7701",
+                nmContato: "Andre Comercial",
+                cdPessoaResp: "900001",
+                vlTotalContrato: 87500.00,
+                ieAvisaVencimento: "S",
+                ieAvisaVencSetor: "N",
+                ieClassificacao: "AD",
+                cdPessoaNegoc: "900001",
+                dtAssinatura: "2026-07-28T00:00:00",
+                telefoneContato: "4230214000",
+                emailContato: "cliente.espelho@fundacao.local",
+                cdCnpjContratante: "44556677000188",
+                cdPessoaContratante: "900001",
+                dsTituloContrato: "Contrato Coletivo Empresarial Fundacao",
+                nrDocumentoExterno: "CRM-CTR-2026-0001",
+                nrSeqCliente: 7101,
+                ieEstagio: "EM_EXECUCAO",
+                ieFinalizado: "N"
+            }
+        ],
+        dependentesContrato: [
+            {
+                nrSequencia: 7801,
+                dtAtualizacao: "2026-07-03T10:50:00",
+                nmUsuario: "integracao.crm",
+                cdPessoaFisica: "900002",
+                nrSeqContrato: 7701,
+                cdCnpj: "44556677000188",
+                ieTipoPessoa: "F",
+                dsPessoa: "Maria Beneficiaria",
+                dsEndereco: "Rua das Integracoes, 1500",
+                nrTelefone: "42999990002",
+                dsContato: "Titular assistida",
+                dsObservacao: "Dependente principal do contrato espelho"
+            }
+        ]
+    };
+
+    function montarExemploPorSecao(secao) {
+        return {
+            [secao]: exemplo[secao] || []
+        };
+    }
+
+    function carregarExemploNaTela() {
+        if (tipoCargaEl.value === "secao") {
+            conteudoJsonEl.value = JSON.stringify(montarExemploPorSecao(secaoEl.value), null, 2);
+            return;
+        }
+
+        conteudoJsonEl.value = JSON.stringify(exemplo, null, 2);
+    }
+
+    function setStatus(texto, error = false) {
+        statusEl.textContent = texto;
+        statusEl.className = error ? "status error" : "status";
+    }
+
+    async function verificarBackend() {
+        try {
+            const response = await fetch("/api/espelho-tasy/health");
+            if (!response.ok) {
+                throw new Error("Backend indisponivel");
+            }
+            setStatus("Backend pronto para receber integracoes manuais.");
+        } catch (error) {
+            setStatus("Nao foi possivel acessar a API. Confirme se a aplicacao esta em execucao.", true);
+        }
+    }
+
+    arquivoEl.addEventListener("change", async (event) => {
+        const file = event.target.files?.[0];
+        if (!file) {
+            return;
+        }
+
+        conteudoJsonEl.value = await file.text();
+        setStatus(`Arquivo carregado: ${file.name}`);
+    });
+
+    tipoCargaEl.addEventListener("change", () => {
+        const cargaPorSecao = tipoCargaEl.value === "secao";
+        secaoEl.disabled = !cargaPorSecao;
+        carregarExemploNaTela();
+        setStatus(
+            cargaPorSecao
+                ? "Modo individual ativo. A tela prepara o JSON da secao selecionada."
+                : "Modo completo ativo. A tela prepara o JSON com todas as secoes."
+        );
+    });
+
+    secaoEl.addEventListener("change", () => {
+        if (tipoCargaEl.value !== "secao") {
+            return;
+        }
+
+        carregarExemploNaTela();
+        setStatus(`Secao individual selecionada: ${secaoEl.value}.`);
+    });
+
+    document.getElementById("preencherExemplo").addEventListener("click", () => {
+        carregarExemploNaTela();
+        setStatus(
+            tipoCargaEl.value === "secao"
+                ? `Exemplo individual da secao ${secaoEl.value} preenchido na tela.`
+                : "Exemplo completo do fluxo preenchido na tela."
+        );
+    });
+
+    document.getElementById("limpar").addEventListener("click", () => {
+        conteudoJsonEl.value = "";
+        resultadoEl.textContent = "Aguardando envio...";
+        arquivoEl.value = "";
+        setStatus("Formulario limpo.");
+    });
+
+    document.getElementById("enviar").addEventListener("click", async () => {
+        const conteudoJson = conteudoJsonEl.value.trim();
+        if (!conteudoJson) {
+            setStatus("Informe o JSON antes de persistir.", true);
+            return;
+        }
+
+        resultadoEl.textContent = "Processando...";
+        setStatus("Enviando JSON para persistencia...");
+
+        try {
+            const cargaPorSecao = tipoCargaEl.value === "secao";
+            const endpoint = cargaPorSecao
+                ? "/api/espelho-tasy/carga-secao/processar-json-manual"
+                : "/api/espelho-tasy/carga-completa/processar-json-manual";
+            const body = {
+                conteudoJson,
+                origem: origemEl.value.trim() || "ui-manual"
+            };
+
+            if (cargaPorSecao) {
+                body.secao = secaoEl.value;
+            }
+
+            const response = await fetch(endpoint, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(body)
+            });
+
+            const responseBody = await response.json();
+            if (!response.ok) {
+                throw new Error(JSON.stringify(responseBody, null, 2));
+            }
+
+            resultadoEl.textContent = JSON.stringify(responseBody, null, 2);
+            setStatus(
+                cargaPorSecao
+                    ? `Integracao individual da secao ${secaoEl.value} persistida com sucesso.`
+                    : "Integracao completa persistida com sucesso."
+            );
+        } catch (error) {
+            resultadoEl.textContent = error.message;
+            setStatus("Falha ao persistir a integracao manual.", true);
+        }
+    });
+
+    carregarExemploNaTela();
+    verificarBackend();
+</script>
+</body>
+</html>

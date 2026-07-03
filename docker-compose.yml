@@ -1,0 +1,20 @@
+services:
+  postgres-fundacao:
+    image: postgres:16-alpine
+    container_name: postgres-fundacao-poc
+    environment:
+      POSTGRES_DB: fundacao_poc
+      POSTGRES_USER: fundacao
+      POSTGRES_PASSWORD: fundacao
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_fundacao_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fundacao -d fundacao_poc"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_fundacao_data:

@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: atendimentomicro
+  cloud:
+    config:
+      uri: http://cloudconfig.unimedpg.local:8888
+      label: homologacao
+  config:
+    import:
+      - optional:configserver:http://cloudconfig.unimedpg.local:8888
+  profiles:
+    active:
+      - tasy
+      - swagger
+
+spring:
+  application:
+    name: labiroapi
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+  cloud:
+    config:
+      uri: http://cloudconfig.unimedpg.local:8888
+      label: producao
+  config:
+    import:
+      - optional:configserver:http://cloudconfig.unimedpg.local:8888
+  profiles:
+    active:
+      - tasy
+      - kong-micro
+
+tasy:
+  requisicao:
+    storage: tasy-storage://CPOE.21e710f2-138c-4935-bcef-e4259188b342
+    disco: /mnt/CPOE
+    usuario: labiro

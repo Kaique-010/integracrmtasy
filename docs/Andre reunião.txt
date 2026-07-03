@@ -1,0 +1,27 @@
+Andre reunião 
+
+REUNIÃO COM FEDERAÇÃO CRM - 02/07
+ 
+Contexto: Utilizarmos toda a parte comercial do CRM e integrar com a nossa proposta de adesão do Tasy. Temos o produto viável (desenho do fluxo) mas temos várias fases de integrações a serem realizadas.
+ 
+Dúvida: O Vcom seria disparado por onde? Ele dispararia do Tasy, dentro da proposta de adesão, dispararia dali, e integraria ao contrato. O Vcom entra depois das fases de integrações.
+ 
+Próximos passos:
+ 
+Integrar a fase dos contratantes primeiro e depois os beneficiários;
+Federação irá nos mandar os 3 JSON's para configurarmos as API's do nosso lado;
+Estruturar o projeto, criar um cronograma com a Beatriz da federação, e partir para o trabalho;
+Da nossa parte já temos a estimativa de tempo, disponibilidade, estamos com RoadMap cheio, iremos tratar esse projeto como prioridade, a federação já consegue iniciar também, usar uma parte dessa semana e da próxima para já começar;
+ 
+Estimativa de esforço:
+ 
+Marcar uma próxima agenda, para iniciarmos o processo de estimativa, Beatriz e Fernando da federação irão entrar em contato conosco para agendar.
+ 
+Encaminhamentos:
+ 
+Eduardo Hey ficou de encaminhar os JSON's para o Jonathan;
+Jonathan encaminhar algumas estimativas prévias de esforço para o Eduardo;
+ 
+Próximos encontros:
+ 
+Quinta-Feira - 09/07

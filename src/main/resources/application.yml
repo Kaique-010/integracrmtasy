@@ -1,0 +1,58 @@
+spring:
+  application:
+    name: integracao-tasy-fundacao-poc
+  datasource:
+    url: ${FOUNDATION_DATASOURCE_URL:jdbc:postgresql://localhost:5433/fundacao_poc}
+    username: ${FOUNDATION_DATASOURCE_USERNAME:fundacao}
+    password: ${FOUNDATION_DATASOURCE_PASSWORD:fundacao}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        default_schema: ${FOUNDATION_HIBERNATE_SCHEMA:espelho_tasy_full}
+        format_sql: true
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: false
+  mvc:
+    problemdetails:
+      enabled: true
+
+server:
+  port: ${SERVER_PORT:8082}
+
+springdoc:
+  swagger-ui:
+    path: /swagger
+
+logging:
+  level:
+    com.unimedpg.atendimentomicro: INFO
+
+integration:
+  json:
+    directory: ${INTEGRATION_JSON_DIRECTORY:docs/jsons}
+    contractor-file-name: ${INTEGRATION_CONTRACTOR_FILE:contratante.json}
+    proposal-file-name: ${INTEGRATION_PROPOSAL_FILE:proposta.json}
+    beneficiaries-file-name: ${INTEGRATION_BENEFICIARIES_FILE:beneficiarios.json}
+  espelho-json:
+    directory: ${INTEGRATION_ESPELHO_DIRECTORY:docs/jsons}
+    file-name: ${INTEGRATION_ESPELHO_FILE:espelho_tasy_fluxo_completo.json}
+
+tasy:
+  datasource:
+    enabled: ${TASY_DATASOURCE_ENABLED:false}
+    url: ${TASY_DATASOURCE_URL:}
+    username: ${TASY_DATASOURCE_USERNAME:}
+    password: ${TASY_DATASOURCE_PASSWORD:}
+    driver-class-name: ${TASY_DATASOURCE_DRIVER:oracle.jdbc.OracleDriver}
+  lookup:
+    enabled: ${TASY_LOOKUP_ENABLED:false}
+    contractor-sql: >
+      select nr_sequencia as id, nr_cgc_cpf as document, nm_razao_social as legal_name
+      from pessoa_juridica
+      where regexp_replace(nr_cgc_cpf, '[^0-9]', '') = :document
+      fetch first 1 rows only

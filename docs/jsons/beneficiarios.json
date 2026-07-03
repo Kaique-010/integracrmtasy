@@ -1,0 +1,16 @@
+[
+  {
+    "name": "Maria de Souza",
+    "cpf": "123.456.789-00",
+    "birthDate": "1988-05-10",
+    "relationship": "TITULAR",
+    "portability": true
+  },
+  {
+    "name": "Joao de Souza",
+    "cpf": "987.654.321-00",
+    "birthDate": "2012-09-21",
+    "relationship": "DEPENDENTE",
+    "portability": false
+  }
+]

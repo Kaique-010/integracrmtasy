@@ -1,0 +1,54 @@
+Processo se dá no tasy da seguinte maneira 
+
+
+começa o processo em OPS gestão comercial 
+tasy -  OPS gestão comercial - é a rotina em que se encontra as leads que são os possíveis clientes a aderirem 
+
+para adição de um novo clica em adicionar, nada mais é do que um cadastro de cliente potencial 
+
+onde é preenchido todos os dados para o cadastro do lead que poderá virar um contrato aderente 
+
+clicando com o botão direito após o envio da solicitação pro cliente e tem as opções de vincular a gestão do lead com a pessoa entre outras opções 
+
+então é necessário a adição dos dados de pessoa física ou jurídica, na OPS pessoa jurídica 
+
+
+depois do cadastro de pessoa jurídica, é vinculado a pessoa a solicitação, filtra pelo documento cadastrado anteriormente, e depois vincula confirmando os dados  
+
+Depois disto feito, aprovada a lead ela vira um prospect que é outro status do crm 
+
+Clica com o botão Direito e gera uma proposta de adesão 
+
+
+
+Proposta de adesão (Espelho do contrato)
+é preenchido os dados do pagador 
+do produto contratado - pesquisa o produto - seleciona o produto avança, pega uma tabela de preço 
+inclusão de novos beneficiários - e de dependentes clicando no botão direito 
+e cria a partir de um cadastro de adesão uma portabilidade, para casos específicos .
+
+
+depois de feito o processo é preciso a validação no botão direito 
+
+em gerar validação;
+e depois gerar a contratação para a finalização 
+
+
+
+Fluxo com GAPs
+
+gestão comercial 
+
+
+
+
+
+fluxo atual falha
+processo é feito duplicado 
+
+é hoje complicado fazer as movimentações de conseguir fazer a reserva de mercado, pois é possível inserir mais de uma vez com o mesmo CNPJ 
+depois da integração será feito só no CRM da federação , pois lá ele já busca as info automaticamente, finaliza-se então o cadastro lá e puxa os dados no tasy 
+
+
+
+

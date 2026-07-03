@@ -1,0 +1,313 @@
+Reunião de alinhamento para integração com o CRM da Fundação 
+
+
+Contexto:
+
+CRM x Tasy
+
+comercial - fazer a integração, pegando o contrato do CRM integrar na proposta de adesão 
+
+e a finalização seria o de contrato para a geração do contrato junto ao tasy com a assinatura eletrônica
+
+
+integração do contrato - formato de proposta de adesão, e esse numero retorna o numero da carteirinha 
+
+VCOM - o que é (Tudo no banner) - 
+Dentro do desenho o vcon ainda nem era implantado 
+o tasy serviria como o integrador do envio do Vcon 
+
+integração via json 
+eles possuem já 3 jsons para a integração dos dados 
+
+
+a partir dos jsons iriamos desenvolver as apis com o tasy para a comunicação 
+
+Cronograma para  a integração 
+
+Estimativa de tempo e prazo para
+
+o Roadmap do CRM está elencado para inicio breve
+
+portabilidade Autcom -  e ele manda para o tasy 
+
+primeiro consultar se tem o CNPJ do contratante
+atualizar 
+cadastrar
+
+proposta 
+cria as portabilidade
+e aí termina 
+
+portabilidade popula o tasy
+start pra assinatura feita direto no Tasy 
+fluxo que é o atual 
+
+
+inserção do crm em ponta grossa ate a parte de vendas
+
+ate a geração do contrato e envio dos beneficiários completa ate o envio e assinatura
+
+
+Uma nova proposta de horas e prazo
+
+
+como vai ser em json 
+
+consumiríamos o json, batendo na nossa api, para a entrada dos dados no tasy 
+
+
+
+
+Objetivo da Integração
+
+Integrar o CRM da Fundação com o Tasy para que o processo comercial aconteça no CRM e o Tasy fique responsável pela operação e geração dos contratos.
+
+Fluxo Esperado
+Venda realizada no CRM.
+CRM envia os dados para o Tasy via JSON.
+Tasy:
+Consulta se o contratante já existe (CNPJ/CPF).
+Atualiza cadastro se existir.
+Cadastra se não existir.
+Tasy cria a proposta de adesão.
+Tasy processa beneficiários e portabilidades.
+Tasy gera o contrato.
+Assinatura eletrônica ocorre através do fluxo do Tasy.
+Após conclusão:
+É gerado o número da carteirinha.
+Retorna informação para o CRM.
+Sobre os JSONs
+
+Pelo que foi dito:
+
+Já existem 3 JSONs definidos.
+Esses JSONs representam os dados necessários para integração.
+A equipe do Tasy deverá desenvolver APIs para receber esses JSONs.
+O CRM consumirá/executará essas APIs para enviar os dados.
+
+Ou seja:
+
+CRM
+  ↓ JSON
+API Tasy
+  ↓
+Tasy
+  ↓
+Contrato
+  ↓
+Assinatura
+  ↓
+Carteirinha
+Portabilidade
+
+Fluxo citado:
+
+CRM
+  ↓
+Portabilidade (Autcom)
+  ↓
+Tasy
+  ↓
+Geração de contrato
+  ↓
+Assinatura
+
+A portabilidade alimenta o Tasy e segue o fluxo padrão até a assinatura.
+
+VCON
+
+Pelo que você anotou:
+
+O VCON já existe no contexto da Fundação.
+No desenho original ele ainda não estava implantado.
+O Tasy serviria como integrador/intermediário para envio de informações ao VCON.
+Precisa ser validado na próxima reunião qual será exatamente o papel do VCON no fluxo final.
+Entrega Solicitada
+
+Você provavelmente precisa retornar:
+
+Levantamento técnico dos 3 JSONs.
+APIs necessárias no Tasy.
+Pontos de entrada e retorno.
+Estimativa de horas.
+Cronograma.
+Prazo de entrega.
+Nova proposta comercial da integração.
+Perguntas que eu faria antes de estimar
+Quais são os 3 JSONs?
+O CRM vai consumir APIs REST?
+O retorno será síncrono ou assíncrono?
+Como ocorre a assinatura eletrônica hoje?
+Existe webhook de retorno da assinatura?
+O número da carteirinha é gerado imediatamente ou por processamento posterior?
+O VCON participa desta primeira fase ou ficará para uma segunda etapa?
+
+Se essas anotações forem da reunião inteira, eu diria que o principal entendimento é:
+
+O CRM será o front comercial, e o Tasy continuará sendo o sistema responsável por cadastro, proposta, contrato, beneficiários, portabilidade, assinatura e geração da carteirinha, através de integrações JSON expostas por APIs
+
+
+
+Se você for o responsável pela integração em Kotlin e o Tasy for o sistema de destino, normalmente o fluxo fica assim:
+
+CRM
+  ↓
+API Kotlin
+  ↓
+Tasy
+  ↓
+Banco Oracle
+  ↓
+Tasy processa regras
+  ↓
+Resposta para API Kotlin
+  ↓
+CRM
+Cenário 1 — Kotlin como camada de integração (mais comum)
+
+O CRM envia:
+
+{
+  "cnpj": "12345678000199",
+  "razaoSocial": "Empresa XYZ",
+  "beneficiarios": [...]
+}
+
+A API Kotlin recebe:
+
+@PostMapping("/propostas")
+fun criarProposta(
+    @RequestBody request: PropostaRequest
+): ResponseEntity<Any> {
+
+    val resultado = tasyService.criarProposta(request)
+
+    return ResponseEntity.ok(resultado)
+}
+
+O Service chama o Tasy:
+
+@Service
+class TasyService(
+    private val tasyClient: TasyClient
+) {
+
+    fun criarProposta(request: PropostaRequest): PropostaResponse {
+        return tasyClient.enviarProposta(request)
+    }
+}
+
+E o Client chama uma API do Tasy:
+
+@FeignClient(name = "tasy")
+interface TasyClient {
+
+    @PostMapping("/api/propostas")
+    fun enviarProposta(
+        @RequestBody request: PropostaRequest
+    ): PropostaResponse
+}
+Cenário 2 — Kotlin gravando direto no Oracle do Tasy
+
+Alguns hospitais fazem isso.
+
+CRM
+ ↓
+API Kotlin
+ ↓
+Oracle Tasy
+ ↓
+Packages PL/SQL
+ ↓
+Tasy
+
+Exemplo:
+
+@Repository
+class PropostaRepository(
+    private val jdbcTemplate: JdbcTemplate
+) {
+
+    fun criarProposta(dto: PropostaDTO) {
+
+        jdbcTemplate.update(
+            """
+            insert into proposta_adesao (...)
+            values (...)
+            """
+        )
+    }
+}
+
+Ou chamando package:
+
+begin
+   pkg_contrato.criar_contrato(
+      p_cnpj => ?
+   );
+end;
+
+Esse modelo exige conhecer tabelas, triggers e packages do Tasy.
+
+Cenário 3 — Kotlin chamando procedures do Tasy
+
+Muito comum em clientes Tasy.
+
+CRM
+ ↓
+API Kotlin
+ ↓
+Procedure Oracle
+ ↓
+Tasy
+
+Exemplo:
+
+simpleJdbcCall
+    .withProcedureName("GERAR_PROPOSTA")
+    .execute(
+        mapOf(
+            "P_CNPJ" to cnpj
+        )
+    )
+O que eu apostaria para sua reunião?
+
+Pelas anotações:
+
+"já possuem 3 jsons"
+
+"a partir dos jsons desenvolver as apis"
+
+"integração via json"
+
+Isso indica fortemente:
+
+CRM
+ ↓ JSON
+API Kotlin/Spring
+ ↓
+Tasy
+ ↓
+Resposta JSON
+ ↓
+CRM
+
+Ou seja, vocês provavelmente vão construir APIs REST em Kotlin/Spring que receberão os JSONs do CRM e internamente executarão as rotinas do Tasy (packages, procedures ou APIs internas).
+
+Na próxima reunião eu perguntaria:
+
+O Tasy será consumido por API ou por banco Oracle?
+Já existe package para criação de proposta?
+Já existe package para geração de contrato?
+O número da carteirinha vem imediatamente ou em processamento posterior?
+Quais são os 3 JSONs exatamente?
+
+Essas respostas definem se você vai trabalhar mais com Spring REST ou mais com Oracle/PLSQL do Tasy.
+
+
+
+VCON - documento referente a aceitação de raio, exemplo cliente potencial de Curitiba mas que fechar com a unimed ponta grossa
+AUTCON - 
+
+
+

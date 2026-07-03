@@ -1,0 +1,6 @@
+- PESSOA_JURIDICA para contratante,
+- PESSOA_FISICA para pessoa/beneficiário,
+- COM_SOLIC_LEAD e COM_LEADS para lead,
+- CML_PROSPECT e CML_PROSPECT_PRODUTO para prospect,
+- COM_CLIENTE_PROPOSTA e COM_CANAL_PROPOSTA para proposta,
+- COM_SOLIC_CONTRATO , CONTRATO e CONTRATO_DEPENDENTE para contratação/dependência.

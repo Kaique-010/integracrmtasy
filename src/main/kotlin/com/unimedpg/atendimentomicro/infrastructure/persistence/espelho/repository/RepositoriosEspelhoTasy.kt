@@ -1,0 +1,32 @@
+package com.unimedpg.atendimentomicro.infrastructure.persistence.espelho.repository
+
+import com.unimedpg.atendimentomicro.infrastructure.persistence.espelho.entity.CanalEspelhoEntity
+import com.unimedpg.atendimentomicro.infrastructure.persistence.espelho.entity.ClienteEspelhoEntity
+import com.unimedpg.atendimentomicro.infrastructure.persistence.espelho.entity.ContratoEspelhoEntity
+import com.unimedpg.atendimentomicro.infrastructure.persistence.espelho.entity.DependenteContratoEspelhoEntity
+import com.unimedpg.atendimentomicro.infrastructure.persistence.espelho.entity.LeadEspelhoEntity
+import com.unimedpg.atendimentomicro.infrastructure.persistence.espelho.entity.PessoaFisicaEspelhoEntity
+import com.unimedpg.atendimentomicro.infrastructure.persistence.espelho.entity.PessoaJuridicaEspelhoEntity
+import com.unimedpg.atendimentomicro.infrastructure.persistence.espelho.entity.ProdutoEspelhoEntity
+import com.unimedpg.atendimentomicro.infrastructure.persistence.espelho.entity.ProdutoProspectEspelhoEntity
+import com.unimedpg.atendimentomicro.infrastructure.persistence.espelho.entity.PropostaCanalEspelhoEntity
+import com.unimedpg.atendimentomicro.infrastructure.persistence.espelho.entity.PropostaClienteEspelhoEntity
+import com.unimedpg.atendimentomicro.infrastructure.persistence.espelho.entity.ProspectEspelhoEntity
+import com.unimedpg.atendimentomicro.infrastructure.persistence.espelho.entity.SolicitacaoContratoEspelhoEntity
+import com.unimedpg.atendimentomicro.infrastructure.persistence.espelho.entity.SolicitacaoLeadEspelhoEntity
+import org.springframework.data.jpa.repository.JpaRepository
+
+interface PessoaJuridicaEspelhoRepository : JpaRepository<PessoaJuridicaEspelhoEntity, String>
+interface PessoaFisicaEspelhoRepository : JpaRepository<PessoaFisicaEspelhoEntity, String>
+interface LeadEspelhoRepository : JpaRepository<LeadEspelhoEntity, Long>
+interface SolicitacaoLeadEspelhoRepository : JpaRepository<SolicitacaoLeadEspelhoEntity, Long>
+interface ClienteEspelhoRepository : JpaRepository<ClienteEspelhoEntity, Long>
+interface CanalEspelhoRepository : JpaRepository<CanalEspelhoEntity, Long>
+interface ProspectEspelhoRepository : JpaRepository<ProspectEspelhoEntity, Long>
+interface ProdutoEspelhoRepository : JpaRepository<ProdutoEspelhoEntity, Long>
+interface ProdutoProspectEspelhoRepository : JpaRepository<ProdutoProspectEspelhoEntity, Long>
+interface PropostaClienteEspelhoRepository : JpaRepository<PropostaClienteEspelhoEntity, Long>
+interface PropostaCanalEspelhoRepository : JpaRepository<PropostaCanalEspelhoEntity, Long>
+interface SolicitacaoContratoEspelhoRepository : JpaRepository<SolicitacaoContratoEspelhoEntity, Long>
+interface ContratoEspelhoRepository : JpaRepository<ContratoEspelhoEntity, Long>
+interface DependenteContratoEspelhoRepository : JpaRepository<DependenteContratoEspelhoEntity, Long>
